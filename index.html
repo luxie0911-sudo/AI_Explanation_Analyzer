@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Explanation Analyzer</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family: Arial, sans-serif;
+
+            background: #0f172a;
+
+            color: white;
+
+        }
+
+
+        .container {
+
+            width: 90%;
+
+            max-width: 1000px;
+
+            margin: 40px auto;
+
+        }
+
+
+        h1 {
+
+            text-align: center;
+
+            color: #60a5fa;
+
+            font-size: 36px;
+
+        }
+
+
+        .subtitle {
+
+            text-align: center;
+
+            color: #94a3b8;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .card {
+
+            background: #1e293b;
+
+            padding: 25px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.3);
+
+        }
+
+
+        label {
+
+            display: block;
+
+            margin-top: 15px;
+
+            margin-bottom: 8px;
+
+            font-weight: bold;
+
+        }
+
+
+        input,
+        textarea {
+
+            width: 100%;
+
+            background: #020617;
+
+            color: white;
+
+            border: 1px solid #475569;
+
+            border-radius: 8px;
+
+            padding: 12px;
+
+            font-size: 15px;
+
+        }
+
+
+        input {
+
+            height: 45px;
+
+        }
+
+
+        textarea {
+
+            height: 250px;
+
+            resize: vertical;
+
+            font-family: Arial, sans-serif;
+
+        }
+
+
+        button {
+
+            margin-top: 20px;
+
+            background: #2563eb;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 7px;
+
+            padding: 13px 25px;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+        }
+
+
+        button:hover {
+
+            background: #1d4ed8;
+
+        }
+
+
+        button:disabled {
+
+            background: #475569;
+
+            cursor: not-allowed;
+
+        }
+
+
+        .result {
+
+            margin-top: 25px;
+
+            padding: 20px;
+
+            background: #020617;
+
+            border: 1px solid #334155;
+
+            border-radius: 8px;
+
+            min-height: 200px;
+
+            white-space: pre-wrap;
+
+            line-height: 1.7;
+
+        }
+
+
+        .loading {
+
+            color: #facc15;
+
+        }
+
+
+        .error {
+
+            color: #f87171;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <h1>
+        🤖 AI Explanation Analyzer
+    </h1>
+
+
+    <p class="subtitle">
+        Analyze your explanation and improve your answer using AI.
+    </p>
+
+
+    <div class="card">
+
+
+        <label for="topic">
+            📚 Topic
+        </label>
+
+
+        <input
+            type="text"
+            id="topic"
+            placeholder="Example: Photosynthesis"
+        >
+
+
+        <label for="explanation">
+            ✍️ Your Explanation
+        </label>
+
+
+        <textarea
+            id="explanation"
+            placeholder="Write your explanation here..."
+        ></textarea>
+
+
+        <button
+            id="analyzeButton"
+            onclick="analyzeExplanation()"
+        >
+            🔍 Analyze Explanation
+        </button>
+
+
+        <div
+            id="result"
+            class="result"
+        >
+            Your analysis will appear here.
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+async function analyzeExplanation() {
+
+
+    const topic =
+        document.getElementById("topic").value;
+
+
+    const explanation =
+        document.getElementById("explanation").value;
+
+
+    const result =
+        document.getElementById("result");
+
+
+    const button =
+        document.getElementById("analyzeButton");
+
+
+    if (!topic.trim()) {
+
+        result.innerHTML =
+            '<span class="error">' +
+            'Please enter a topic.' +
+            '</span>';
+
+        return;
+
+    }
+
+
+    if (!explanation.trim()) {
+
+        result.innerHTML =
+            '<span class="error">' +
+            'Please enter your explanation.' +
+            '</span>';
+
+        return;
+
+    }
+
+
+    button.disabled = true;
+
+    button.innerText =
+        "🤖 Analyzing...";
+
+
+    result.innerHTML =
+        '<span class="loading">' +
+        'AI is analyzing your explanation...' +
+        '</span>';
+
+
+    try {
+
+
+        const response = await fetch(
+            "/analyze",
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    topic: topic,
+
+                    explanation: explanation
+
+                })
+
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (data.success) {
+
+            result.innerText =
+                data.result;
+
+        }
+
+        else {
+
+            result.innerHTML =
+                '<span class="error">' +
+                data.result +
+                '</span>';
+
+        }
+
+
+    }
+
+    catch (error) {
+
+        result.innerHTML =
+            '<span class="error">' +
+            'Could not connect to server: ' +
+            error.message +
+            '</span>';
+
+    }
+
+
+    button.disabled = false;
+
+    button.innerText =
+        "🔍 Analyze Explanation";
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
